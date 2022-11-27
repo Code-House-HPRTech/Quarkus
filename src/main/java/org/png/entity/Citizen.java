@@ -3,6 +3,7 @@ package org.png.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Citizen {
@@ -12,9 +13,8 @@ public class Citizen {
     String name;
     String gender;
 
-    @JsonManagedReference
-    @OneToOne(mappedBy = "citizen",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    Aadhar aadhar;
+    @OneToMany(mappedBy = "citizen", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    List<SimCard> simCard;
 
     public Long getId() {
         return id;
@@ -40,11 +40,11 @@ public class Citizen {
         this.gender = gender;
     }
 
-    public Aadhar getAadhar() {
-        return aadhar;
+    public List<SimCard> getSimCard() {
+        return simCard;
     }
 
-    public void setAadhar(Aadhar aadhar) {
-        this.aadhar = aadhar;
+    public void setSimCard(List<SimCard> simCard) {
+        this.simCard = simCard;
     }
 }
