@@ -1,13 +1,16 @@
 package org.png.resource;
 
+import org.png.entity.Bank;
 import org.png.entity.Citizen;
-import org.png.entity.SimCard;
+import org.png.repository.BankRepository;
 import org.png.repository.CitizenRepository;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -15,43 +18,66 @@ import java.util.List;
 public class Resource {
 
     @Inject
+    BankRepository bankRepository;
+
+    @Inject
     CitizenRepository citizenRepository;
 
     @GET
-    @Path("/save")
+    @Path("save_bank")
     @Transactional
-    public Response saveData(){
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response saveBank(){
+        String[] bankNames = {"SBI","PNB","AXIS","HDFC","ICICI","KOTAK"};
 
-        Citizen citizen = new Citizen();
-        citizen.setName("Ramesh");
-        citizen.setGender("M");
+        for (String bankName : bankNames){
+            Bank bank = new Bank();
+            bank.setBranch("IT Park, EPIP Sitapura");
+            bank.setName(bankName);
+            bank.setIfscCode("IFCS22"+bankName);
 
-        SimCard simCard1 = new SimCard();
-        simCard1.setActive(true);
-        simCard1.setNumber(9987L);
-        simCard1.setProvider("Jio");
-        simCard1.setCitizen(citizen);
-
-        SimCard simCard2 = new SimCard();
-        simCard2.setActive(true);
-        simCard2.setNumber(8778L);
-        simCard2.setProvider("Airtel");
-        simCard2.setCitizen(citizen);
-
-        SimCard simCard3 = new SimCard();
-        simCard3.setActive(true);
-        simCard3.setNumber(6786L);
-        simCard3.setProvider("Jio");
-        simCard3.setCitizen(citizen);
-
-        citizen.setSimCard(List.of(simCard1,simCard2,simCard3));
-
-        citizenRepository.persist(citizen);
-
-        if(citizenRepository.isPersistent(citizen)){
-            return  Response.ok(new String("Citizen with Sim saved Successfully")).build();
+            bankRepository.persist(bank);
         }
-        return  Response.ok(new String("Something went wrong")).build();
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Path("save_citizen")
+    @Transactional
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response saveCitizen(){
+        String[] bankNames = {"SBI","PNB","AXIS","HDFC","ICICI","KOTAK"};
+
+        Bank SBIBank = bankRepository.find("name",bankNames[0]).firstResult();
+        Bank PNBBank = bankRepository.find("name",bankNames[1]).firstResult();
+        Bank AXISBank = bankRepository.find("name",bankNames[2]).firstResult();
+        Bank HDFCBank = bankRepository.find("name",bankNames[3]).firstResult();
+        Bank ICICIBank = bankRepository.find("name",bankNames[4]).firstResult();
+        Bank KOTAKBank = bankRepository.find("name",bankNames[5]).firstResult();
+
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + PNBBank);
+
+        Citizen citizenRahul = new Citizen();
+        citizenRahul.setName("Rahul");
+        citizenRahul.setGender("M");
+        citizenRahul.setBankList(List.of(SBIBank,AXISBank,ICICIBank,PNBBank));
+
+        Citizen citizenAaka = new Citizen();
+        citizenAaka.setName("Aakanksha");
+        citizenAaka.setGender("F");
+        citizenAaka.setBankList(List.of(SBIBank,AXISBank,KOTAKBank));
+
+        Citizen citizenMic = new Citizen();
+        citizenMic.setName("Mic");
+        citizenMic.setGender("F");
+        citizenMic.setBankList(List.of(AXISBank));
+
+        citizenRepository.persist(citizenRahul);
+        citizenRepository.persist(citizenAaka);
+        citizenRepository.persist(citizenMic);
+
+
+        return Response.status(Response.Status.OK).build();
     }
 
 }

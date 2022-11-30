@@ -1,8 +1,7 @@
 package org.png.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +12,8 @@ public class Citizen {
     String name;
     String gender;
 
-    @OneToMany(mappedBy = "citizen", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    List<SimCard> simCard;
+    @ManyToMany
+    List<Bank> bankList = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -40,11 +39,11 @@ public class Citizen {
         this.gender = gender;
     }
 
-    public List<SimCard> getSimCard() {
-        return simCard;
+    public List<Bank> getBankList() {
+        return bankList;
     }
 
-    public void setSimCard(List<SimCard> simCard) {
-        this.simCard = simCard;
+    public void setBankList(List<Bank> bankList) {
+        this.bankList = bankList;
     }
 }
