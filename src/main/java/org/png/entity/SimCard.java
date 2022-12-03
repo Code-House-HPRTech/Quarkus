@@ -11,9 +11,6 @@ public class SimCard {
     String provider;
     boolean isActive;
 
-    @ManyToOne
-    Citizen citizen;
-
     public Long getId() {
         return id;
     }
@@ -46,11 +43,13 @@ public class SimCard {
         isActive = active;
     }
 
-    public Citizen getCitizen() {
-        return citizen;
-    }
-
-    public void setCitizen(Citizen citizen) {
-        this.citizen = citizen;
+    @Override
+    public String toString() {
+        return "SimCard{" +
+                "id=" + id +
+                ", number=" + number +
+                ", provider='" + provider + '\'' +
+                ", isActive=" + isActive +
+                '}';
     }
 }
