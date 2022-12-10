@@ -1,5 +1,6 @@
 package org.png.resource;
 
+import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.png.entity.SimCard;
 import org.png.repository.SimCardRepository;
@@ -10,6 +11,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/")
 public class Resource {
@@ -68,6 +70,76 @@ public class Resource {
     public Response activeListSimCard() {
         List<SimCard> simCardList = simCardRepository.list("isActive", true);
         return Response.ok(simCardList).build();
+    }
+
+    @GET
+    @Path("/findByIdOptional_SimCard/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response findByIdOptionalSimCard(@PathParam("id") Long id) {
+        Optional<SimCard> OptionalSimCard = simCardRepository.findByIdOptional(id);
+        if (OptionalSimCard.isPresent()) {
+            SimCard simCard = OptionalSimCard.get();
+            return Response.ok(simCard).build();
+        } else {
+            return Response.noContent().build();
+        }
+    }
+
+    @GET
+    @Path("/conditional_count_SimCard/{provider}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response conditionalCountSimCard(@PathParam("provider") String simProvider) {
+        //select count(*) from SimCard where provider =  @PathParam("provider")
+        long count = simCardRepository.count("provider", simProvider);
+        return Response.ok(count).build();
+    }
+
+    @GET
+    @Path("/conditional_delete_SimCard/{provider}")
+    @Transactional
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response conditionalDeleteSimCard(@PathParam("provider") String simProvider) {
+        // delete from SimCard where provider =  @PathParam("provider")
+        long delete = simCardRepository.delete("provider", simProvider);
+        return Response.ok(delete).build();
+    }
+
+    @GET
+    @Path("/conditionalDeleteById_SimCard/{id}")
+    @Transactional
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response conditionalDeleteByIdSimCard(@PathParam("id") Long id) {
+        // delete from SimCard where id =  @PathParam("id")
+        boolean isDeleted = simCardRepository.deleteById(id);
+        if (isDeleted)
+            return Response.ok("Sim card deleted successfully").build();
+        else
+            return Response.ok("Something went wrong").build();
+    }
+
+    @GET
+    @Path("/update/{id}/{provider}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Transactional
+    public Response conditionalDeleteSimCard(@PathParam("id") Long id, @PathParam("provider") String provider) {
+        // update SimCard set provider = @PathParam("provider") where id = @PathParam("id")
+        int update = simCardRepository.update("provider =?1 where id =?2", provider, id);
+        if (update == 1)
+            return Response.ok("Sim card provider updated successfully").build();
+        else
+            return Response.ok("Something went wrong").build();
+    }
+
+    @GET
+    @Path("/sortBy")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sortBySimCard() {
+        //select * from SimCard where isActive=false order by provider desc
+        List<SimCard> simCardList = simCardRepository
+                .list("isActive",
+                        Sort.descending("provider"),
+                        false);
+            return Response.ok(simCardList).build();
     }
 
 }
