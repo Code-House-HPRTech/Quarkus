@@ -1,7 +1,10 @@
 package org.png.resource;
 
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.png.dto.projection.SimProjection;
 import org.png.entity.SimCard;
 import org.png.repository.SimCardRepository;
 
@@ -140,6 +143,26 @@ public class Resource {
                         Sort.descending("provider"),
                         false);
             return Response.ok(simCardList).build();
+    }
+
+    @GET
+    @Path("/getSimCard/{pageNo}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response paginationSimCard(@PathParam("pageNo") int pgNo) {
+
+        //Select * from SimCard offset 0 limit 5
+
+        PanacheQuery<SimCard> allSimCardPanacheQuery = simCardRepository.findAll();
+        //allSimCardPanacheQuery.page(Page.ofSize(5));
+
+        //List<SimCard> simCardList = allSimCardPanacheQuery.list();
+        //List<SimCard> simCardList = allSimCardPanacheQuery.nextPage().list();
+
+         allSimCardPanacheQuery.page(Page.of(pgNo, 5));
+
+        List<SimProjection> simCardList = allSimCardPanacheQuery.project(SimProjection.class).list();
+
+        return Response.ok(simCardList).build();
     }
 
 }
