@@ -3,41 +3,54 @@ package com.hprtech.resource;
 
 import com.hprtech.entity.Student;
 import com.hprtech.repository.StudentRepository;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.transaction.Transactional;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 @Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class StudentResource {
 
     @Inject
     StudentRepository studentRepository;
 
-    @GET
-    @Path("getStudentList")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStudentList(){
-        List<Student> studentList = studentRepository.listAll();
-        return Response.ok(studentList).build();
+    @POST
+    @Path("addStudent")
+    @Transactional
+    public Response addStudent(@RequestBody Student student) {
+        studentRepository.persist(student);
+        if (studentRepository.isPersistent(student)) {
+            //localhost:8080/student/id
+            return Response.created(URI.create("/student/" + student.getStudentId())).build();
+        }
+        return Response.ok(Response.status(Response.Status.BAD_REQUEST)).build();
     }
 
     @GET
-    @Path("getCSStudentList")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getCSStudentList(){
-        List<Student> csStudentList =  new ArrayList<>();
-        List<Student> studentList = studentRepository.listAll();
-        studentList.forEach(s->{
-            if(s.getBranch().equalsIgnoreCase("CS")){
-                csStudentList.add(s);
-            }
-        });
-        return Response.ok(csStudentList).build();
+    @Path("student/{id}")
+    @Transactional
+    public Response getStudentById(@PathParam("id") Long id) {
+        Student student = studentRepository.findById(id);
+        if (student == null)
+            return Response.ok(Response.status(Response.Status.NOT_FOUND)).build();
+        else
+            return Response.ok(student).build();
     }
+
+    @GET
+    @Path("getAllStudent")
+    @Transactional
+    public Response getStudentList() {
+        return Response.ok(studentRepository.listAll()).build();
+    }
+
+
 }
