@@ -7,6 +7,7 @@ import com.hprtech.repository.StudentRepository;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -39,5 +40,16 @@ public class StudentResource {
             }
         });
         return Response.ok(csStudentList).build();
+    }
+
+    @GET
+    @Path("student/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStudentById(@PathParam("id") Long id){
+        Student student = studentRepository.findById(id);
+        if (student!=null)
+            return Response.ok(student).build();
+        else
+            return Response.status(Response.Status.NO_CONTENT).build();
     }
 }
