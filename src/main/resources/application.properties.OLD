@@ -5,6 +5,8 @@ quarkus.datasource.jdbc.url=jdbc:postgresql://mouse.db.elephantsql.com:5432/etus
 quarkus.hibernate-orm.log.sql=true
 quarkus.hibernate-orm.database.generation=none
 
+%test.quarkus.http.port=9999
+
 interest_rate=890
 CEO="Anand Kumar"
 branch_list=Jaipur,Jodhpur,Bikaner,Nagaur

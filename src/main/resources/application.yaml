@@ -1,0 +1,15 @@
+quarkus:
+  datasource:
+    db-kind: postgresql
+    username: etuscyav
+    password: RCMImwuUdOvNqtSiaIJr0L9oWrMuuyiX
+    jdbc:
+      url: jdbc:postgresql://mouse.db.elephantsql.com:5432/etuscyav
+  hibernate-orm:
+    log:
+      sql: true
+    database:
+      generation: drop-and-create
+
+  http:
+    port: 9999
