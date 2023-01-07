@@ -1,27 +1,40 @@
 package com.hprtech.resource;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import com.hprtech.dto.Account;
+import com.hprtech.service.AccountService;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.jboss.logging.Logger;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class Resource {
 
-    @ConfigProperty(name="CEO",defaultValue = "CodeHouse")
-    String ceo;
+    public static final Logger LOG = Logger.getLogger(Resource.class);
 
-    @ConfigProperty(name="profile",defaultValue = "NONE")
-    String profile;
+    @Inject
+    AccountService accountService;
 
-    @ConfigProperty(name="interest_rate",defaultValue = "5")
-    String interestRate;
+    @POST
+    @Path("open_account")
+    public Response openAccount(@RequestBody Account account) {
+        LOG.info("Entering in Response::openAccount()");
+        LOG.debug("Response::openAccount() Account "+ account);
 
-    @GET
-    @Path("ceo")
-    public Response getCEOName(){
-        return Response.ok(ceo + " " + profile +  interestRate).build();
+        boolean alreadyExist = accountService.isAccountAlreadyExist(account);
+        LOG.debug("Response::openAccount() alreadyExist "+ alreadyExist);
+
+        if (alreadyExist) {
+            LOG.info("Returning from Resource::openAccount()");
+            return Response.ok("Oops! Account already Exist").build();
+        } else {
+            LOG.info("Returning from Resource::openAccount()");
+            return Response.ok("Thanks for opening account....").build();
+        }
     }
-
 }
