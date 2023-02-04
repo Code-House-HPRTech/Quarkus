@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
@@ -20,28 +22,16 @@ public class Resource {
     AadharRepository aadharRepository;
 
     @GET
-    @Path("save")
+    @Path("get")
     @Transactional
-    public Response saveCitizen(){
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response saveCitizen() {
 
+        Citizen citizen = citizenRepository.findById(1L);
 
+        System.out.println(citizen);
 
-        Citizen citizen = new Citizen();
-        citizen.setGender("M");
-        citizen.setName("Rahul");
-
-        Aadhar aadhar = new Aadhar();
-        aadhar.setAadharNumber(2133L);
-        aadhar.setCompany("UIDAI");
-        aadhar.setCitizen(citizen);
-
-        citizen.setAadhar(aadhar);
-
-        citizenRepository.persist(citizen);
-
-
-
-        return  Response.ok("Saved").build();
+        return Response.ok(citizen).build();
 
     }
 }
