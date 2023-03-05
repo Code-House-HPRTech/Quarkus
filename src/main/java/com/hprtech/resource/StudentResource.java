@@ -5,6 +5,7 @@ import com.hprtech.entity.Student;
 import com.hprtech.repository.StudentRepository;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
@@ -23,6 +24,7 @@ public class StudentResource {
     StudentRepository studentRepository;
 
     @POST
+    @RolesAllowed("admin")
     @Path("addStudent")
     @Transactional
     public Response addStudent(@RequestBody Student student) {
@@ -35,6 +37,7 @@ public class StudentResource {
     }
 
     @GET
+    @RolesAllowed({"admin","teacher"})
     @Path("student/{id}")
     @Transactional
     public Response getStudentById(@PathParam("id") Long id) {
@@ -47,10 +50,9 @@ public class StudentResource {
 
     @GET
     @Path("getAllStudent")
+    @RolesAllowed({"admin","teacher","student"})
     @Transactional
     public Response getStudentList() {
         return Response.ok(studentRepository.listAll()).build();
     }
-
-
 }
