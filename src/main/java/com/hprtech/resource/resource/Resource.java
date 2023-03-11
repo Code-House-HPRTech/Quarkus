@@ -9,6 +9,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -41,11 +42,26 @@ public class Resource {
             } else {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-        }else{
+        } else {
             String errorMsg = validate.stream().map(citizenConstraintViolation -> citizenConstraintViolation.getMessage())
                     .collect(Collectors.joining(", "));
 
             return Response.status(Response.Status.BAD_REQUEST).entity(errorMsg).build();
+        }
+    }
+
+    @POST
+    @Transactional
+    @Path("/saveValid")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response saveCitizenValid(@Valid Citizen citizen) {
+
+        citizenRepository.persist(citizen);
+        if (citizenRepository.isPersistent(citizen)) {
+            return Response.ok(citizen).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 }
